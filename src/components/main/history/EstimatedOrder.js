@@ -102,7 +102,6 @@ const EstimatedOrder = () => {
 				sno: i + 1,
 				name: el.name,
 				invoice: el.invoice_no,
-
 				phoneno: el.phone_num,
 				placed_date: el.date_placed,
 				delivery_date: el.date_of_delivery,

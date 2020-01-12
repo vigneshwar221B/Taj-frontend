@@ -349,7 +349,7 @@ const Neworder = () => {
 						</Grid>
 						<Grid item xs={4} className={classes.amt}>
 							<h3 style={{ marginBottom: 0 }}>
-								Total: {orderlist.total + sorderlist.total - adv}
+								Balance: {orderlist.total + sorderlist.total - adv}
 							</h3>
 						</Grid>
 					</Grid>

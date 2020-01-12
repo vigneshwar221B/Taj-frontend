@@ -13,6 +13,7 @@
     "date-fns": "^2.0.0-beta.5",
     "lodash": "^4.17.15",
     "material-table": "^1.53.0",
+    "moment": "^2.24.0",
     "react": "^16.11.0",
     "react-autocomplete": "^1.8.1",
     "react-dom": "^16.11.0",
