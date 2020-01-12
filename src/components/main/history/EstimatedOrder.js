@@ -1,98 +1,182 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import MaterialTable from 'material-table'
 import Print from '@material-ui/icons/Print'
+import Paid from '@material-ui/icons/AttachMoney'
 import DateFnsUtils from '@date-io/date-fns'
 import {
 	MuiPickersUtilsProvider,
-	KeyboardDatePicker
+	KeyboardDatePicker,
 } from '@material-ui/pickers'
 import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
+import Paper from '@material-ui/core/Paper'
+import Grid from '@material-ui/core/Grid'
+import InputLabel from '@material-ui/core/InputLabel'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import FormControl from '@material-ui/core/FormControl'
+import Select from '@material-ui/core/Select'
+import NativeSelect from '@material-ui/core/NativeSelect'
+import Axios from 'axios'
 
 const useStyles = makeStyles(theme => ({
 	button: {
-		margin: theme.spacing(1)
+		margin: theme.spacing(1),
 	},
 	input: {
-		display: 'none'
+		display: 'none',
 	},
 	root: {
-		flexGrow: 1
+		flexGrow: 1,
 	},
 	paper: {
 		padding: theme.spacing(2),
 		textAlign: 'center',
-		color: theme.palette.text.secondary
-	}
+		color: theme.palette.text.secondary,
+	},
+	formControl: {
+		margin: theme.spacing(1),
+		minWidth: 120,
+	},
+	selectEmpty: {
+		marginTop: theme.spacing(2),
+	},
 }))
 
+//inv,name,ph ,datr
 const EstimatedOrder = () => {
 	const classes = useStyles()
 
-	const [selectedDate, setSelectedDate] = React.useState(
-		new Date('2019-11-01T21:11:54')
-	)
+	const [selectedDate, setSelectedDate] = React.useState(new Date('2019-11-01'))
 	const handleDateChange = date => {
-		setSelectedDate(date)
+		console.log(date)
+
+		Axios.get('http://127.0.0.1:8000/hotel/order/')
+			.then(res => {
+				var chosenDate
+				let newdata = res.data.filter(el => {
+					chosenDate =
+						date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate()
+
+					let recievedDate =
+						new Date(el.date_placed).getFullYear() +
+						'-' +
+						new Date(el.date_placed).getMonth() +
+						'-' +
+						new Date(el.date_placed).getDate()
+
+					return chosenDate == recievedDate
+				})
+				setSelectedDate(cdate => cdate)
+
+				if (newdata.length !== 0) {
+					let customers = newdata.map((el, i) => ({
+						sno: i + 1,
+						name: el.name,
+						invoice: el.invoice_no,
+
+						phoneno: el.phone_num,
+						placed_date: el.date_placed,
+						delivery_date: el.date_of_delivery,
+					}))
+					setOrderState(state => ({
+						...state,
+						data: customers,
+					}))
+				} else {
+					setOrderState(state => ({
+						...state,
+						data: [],
+					}))
+				}
+			})
+			.catch(err => console.log(err))
 	}
-	
-	const [state, setState] = React.useState({
+
+	useEffect(() => {
+		const getData = async () => {
+			let res = await Axios.get('http://127.0.0.1:8000/hotel/order/')
+			console.log(res.data)
+			console.log('mounted')
+
+			const data = res.data.map((el, i) => ({
+				sno: i + 1,
+				name: el.name,
+				invoice: el.invoice_no,
+
+				phoneno: el.phone_num,
+				placed_date: el.date_placed,
+				delivery_date: el.date_of_delivery,
+			}))
+
+			setOrderState(state => ({
+				...state,
+				data,
+			}))
+		}
+		getData()
+	}, [])
+
+	const [orderState, setOrderState] = React.useState({
 		columns: [
 			{ title: 'S.No', field: 'sno' },
 			{ title: 'Invoice No', field: 'invoice' },
 			{ title: 'Name', field: 'name' },
+
 			{
 				title: 'Ph. no',
-				field: 'phoneno'
+				field: 'phoneno',
 			},
-			{ title: 'Date', field: 'date' }
+
+			{ title: 'placed date', field: 'placed_date' },
+			{
+				title: 'delivery date',
+				field: 'delivery_date',
+			},
 		],
-		data: [
-			{
-				sno: '1',
-				name: 'Murphy',
-				invoice: 'dvfdfv',
-				phoneno: '9786676777',
-				date: '14/12/19'
-			},
-			{
-				sno: '2',
-				name: 'Var',
-				invoice: 'dasdafv',
-				phoneno: '97866343777',
-				date: '14/12/19'
-			}
-		]
+		data: [],
 	})
 	return (
-		<div className='row'>
-			<MuiPickersUtilsProvider utils={DateFnsUtils}>
-				<KeyboardDatePicker
-					disableToolbar
-					variant='inline'
-					format='MM/dd/yyyy'
-					margin='normal'
-					id='date-picker-inline'
-					label='Date picker inline'
-					value={selectedDate}
-					onChange={handleDateChange}
-					KeyboardButtonProps={{
-						'aria-label': 'change date'
-					}}
-				/>
-			</MuiPickersUtilsProvider>
-			<Button
-				style={{ marginLeft: '50%' }}
-				variant='contained'
-				color='default'
-				size='large'
-				className={classes.button}
-				startIcon={<Print />}
-			>
-				Print
-			</Button>
+		<div>
+			<div className='row' style={{ margin: 'auto', marginBottom: '2rem' }}>
+				<Grid container spacing={3}>
+					<Grid item xs={6} sm={3}>
+						<MuiPickersUtilsProvider utils={DateFnsUtils}>
+							<KeyboardDatePicker
+								disableToolbar
+								variant='inline'
+								format='MM/dd/yyyy'
+								margin='normal'
+								id='date-picker-inline'
+								label='Date picker inline'
+								value={selectedDate}
+								onChange={handleDateChange}
+								KeyboardButtonProps={{
+									'aria-label': 'change date',
+								}}
+							/>
+						</MuiPickersUtilsProvider>
+					</Grid>
+					<Grid item xs={6} sm={3}></Grid>
+					<Grid item xs={6} sm={3}>
+						<Button
+							style={{ marginLeft: '50%', marginTop: '8%' }}
+							variant='contained'
+							color='default'
+							size='large'
+							className={classes.button}
+							startIcon={<Print />}
+						>
+							Print
+						</Button>
+					</Grid>
+				</Grid>
+			</div>
 
-			<MaterialTable title='' columns={state.columns} data={state.data} />
+			<MaterialTable
+				title=''
+				columns={orderState.columns}
+				data={orderState.data}
+			/>
 		</div>
 	)
 }

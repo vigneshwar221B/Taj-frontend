@@ -18,10 +18,10 @@ import Fab from '@material-ui/core/Fab'
 import Typography from '@material-ui/core/Typography'
 import Table from '../helpers/Table'
 import Axios from 'axios'
-import {useHistory} from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 const Neworder = () => {
-	let history = useHistory();
+	let history = useHistory()
 
 	const [info, setinfo] = useState({
 		name: '',
@@ -133,50 +133,49 @@ const Neworder = () => {
 	}
 
 	const printAndSave = () => {
-		// console.log(postData)
+		console.log(postData)
 
-		// let formData = new FormData()
+		let formData = new FormData()
 
-		// for (var key in postData) {
-		// 	formData.append(key, postData[key])
-		// }
-		// let t1 = orderlist.list
-		// console.log(t1)
+		for (var key in postData) {
+			formData.append(key, postData[key])
+		}
+		let t1 = orderlist.list
+		console.log(t1)
 
-		// formData.append('items', JSON.stringify(orderlist.list))
-		// formData.append('subitems', JSON.stringify(sorderlist.list)) //formData.append('items', JSON.stringify( [{item:'dosa', qty:5}]))
+		formData.append('items', JSON.stringify(orderlist.list))
+		formData.append('subitems', JSON.stringify(sorderlist.list)) //formData.append('items', JSON.stringify( [{item:'dosa', qty:5}]))
 
-		// fetch('http://969de05a.ngrok.io/hotel/order/', {
-		// 	body: formData,
-		// 	contentType: 'application/x-www-form-urlencoded; charset=utf-8', //Default
-		// 	processData: true,
-		// 	method: 'post',
-		// }).then(() => {
-		// 	console.log('posted')
-		// })
+		fetch('http://localhost:8000/hotel/order/', {
+			body: formData,
+			contentType: 'application/x-www-form-urlencoded; charset=utf-8', //Default
+			processData: true,
+			method: 'post',
+		}).then(() => {
+			console.log('posted')
+		})
 
-		// Axios({
-		// 	method: 'post',
-		// 	url: 'http://969de05a.ngrok.io/hotel/order/',
-		// 	data: formData,
-		// 	headers: { 'Content-Type': 'multipart/form-data' },
-		// }).then(() => {
-		// 	console.log('posted')
+		Axios({
+			method: 'post',
+			url: 'http://969de05a.ngrok.io/hotel/order/',
+			data: formData,
+			headers: { 'Content-Type': 'multipart/form-data' },
+		})
+			.then(() => {
+				console.log('posted')
 
-		// 	// props.router.push({
-		// 	// 	pathname: '/print',
-		// 	// 	state: {
-		// 	// 	  id: 7,
-		// 	// 	  color: 'green'
-		// 	// 	}
-		// 	//   })
+				// props.router.push({
+				// 	pathname: '/print',
+				// 	state: {
+				// 	  id: 7,
+				// 	  color: 'green'
+				// 	}
+				//   })
+			})
+			.catch(err => console.log(err))
 
-		// }).catch(err => console.log(err));
-		
-
-		history.push("/print", {name:'souma'});
+		history.push('/print', { name: 'souma' })
 		window.location.reload()
-		
 	}
 
 	const placeAndSave = () => {
@@ -189,9 +188,9 @@ const Neworder = () => {
 		let tlist = []
 		let tsublist = []
 
-		let data = await fetch('http://969de05a.ngrok.io/hotel/items')
+		let data = await fetch('http://localhost:8000/hotel/items')
 		let res = await data.json()
-		let data2 = await fetch('http://969de05a.ngrok.io/hotel/subitems')
+		let data2 = await fetch('http://localhost:8000/hotel/subitems')
 		let res2 = await data2.json()
 		//console.log(res)
 
