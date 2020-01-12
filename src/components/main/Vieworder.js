@@ -11,7 +11,6 @@ import Grid from '@material-ui/core/Grid'
 import Items from './vieworder/Items'
 import Customers from './vieworder/Customers'
 import CustomerAndItems from './vieworder/CustomerAndItems'
-import CustomerDetails from './vieworder/CustomerDetails'
 
 const useStyles = makeStyles(theme => ({
 	formControl: {
@@ -46,7 +45,6 @@ const Vieworder = () => {
 						>
 							<MenuItem value={'Customer'}>Customer</MenuItem>
 							<MenuItem value={'Customer + Items'}>Customer + Items</MenuItem>
-
 							<MenuItem value={'Items'}>Items</MenuItem>
 						</Select>
 					</FormControl>

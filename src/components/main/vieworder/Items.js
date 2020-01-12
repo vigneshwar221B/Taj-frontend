@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper'
 import DateFnsUtils from '@date-io/date-fns'
 import {
 	MuiPickersUtilsProvider,
-	KeyboardDatePicker
+	KeyboardDatePicker,
 } from '@material-ui/pickers'
 import 'date-fns'
 import { makeStyles } from '@material-ui/core/styles'
@@ -14,34 +14,33 @@ import FormControl from '@material-ui/core/FormControl'
 import Select from '@material-ui/core/Select'
 import Button from '@material-ui/core/Button'
 import Print from '@material-ui/icons/Print'
-
-import All from './items/All'
-import Morning from './items/Morning'
-import Afternoon from './items/Afternoon'
-import Evening from './items/Evening'
+import MaterialTable from 'material-table'
 
 const useStyles = makeStyles(theme => ({
 	formControl: {
 		margin: theme.spacing(1),
-		minWidth: 120
+		minWidth: 120,
 	},
 	selectEmpty: {
-		marginTop: theme.spacing(2)
+		marginTop: theme.spacing(2),
 	},
 	button: {
-		margin: theme.spacing(1)
-	}
+		margin: theme.spacing(1),
+	},
+	tableSpacing: {
+		padding: theme.spacing(5),
+		margin: theme.spacing(3),
+		boxShadow: 0,
+		zIndex: 0,
+	},
 }))
 
-const stylesy = {
-	paper: {
-		padding: 10
-	}
-}
+const stylesy = {}
 
 const Items = () => {
 	const classes = useStyles()
 	const [session, setsession] = React.useState('All')
+
 	const handleChange = event => {
 		setsession(event.target.value)
 	}
@@ -57,22 +56,22 @@ const Items = () => {
 			{ title: 'S.No', field: 'sno' },
 			{ title: 'item', field: 'item' },
 			{ title: 'Quantity', field: 'quantity' },
-			{ title: 'Date', field: 'date' }
+			{ title: 'Date', field: 'date' },
 		],
 		data: [
 			{
 				sno: '1',
 				item: 'dosa',
 				quantity: 4,
-				date: '10/12/19'
+				date: '10/12/19',
 			},
 			{
 				sno: '1',
 				item: 'pongal',
 				quantity: 8,
-				date: '10/18/19'
-			}
-		]
+				date: '10/18/19',
+			},
+		],
 	})
 
 	return (
@@ -114,7 +113,7 @@ const Items = () => {
 								value={selectedDate}
 								onChange={handleDateChange}
 								KeyboardButtonProps={{
-									'aria-label': 'change date'
+									'aria-label': 'change date',
 								}}
 							/>
 						</MuiPickersUtilsProvider>
@@ -134,11 +133,21 @@ const Items = () => {
 				</Grid>
 
 				<Grid item xs={12} sm={12}>
-					<Paper style={stylesy.paper}>
-						{session == 'All' && <All state={state} />}
-						{session == 'Morning' && <Morning state={state} />}
-						{session == 'Afternoon' && <Afternoon state={state} />}
-						{session == 'Evening' && <Evening state={state} />}
+					<Paper
+						style={{
+							padding: 10,
+						}}
+					>
+						<>
+							{session}
+							<MaterialTable
+								title=''
+								columns={state.columns}
+								data={state.data}
+								className={classes.tableSpacing}
+								style={{ boxShadow: 'none', padding: '10', width: '100%' }}
+							/>
+						</>
 					</Paper>
 				</Grid>
 			</Grid>
