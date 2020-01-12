@@ -47,24 +47,25 @@ const OrderReport = () => {
 
 	const [selectedDate, setSelectedDate] = React.useState(new Date('2019-11-01'))
 	const handleDateChange = date => {
+		console.log(date)
+
 		Axios.get('http://127.0.0.1:8000/hotel/order/')
 			.then(res => {
+				var chosenDate
 				let newdata = res.data.filter(el => {
-					let chosenDate =
-						date.getFullYear() + '-' + date.getFullYear() + '-' + date.getDate()
+					chosenDate =
+						date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate()
 
 					let recievedDate =
 						new Date(el.date_placed).getFullYear() +
 						'-' +
-						new Date(el.date_placed).getFullYear() +
+						new Date(el.date_placed).getMonth() +
 						'-' +
 						new Date(el.date_placed).getDate()
 
-					console.log(chosenDate)
-					console.log(recievedDate)
-
 					return chosenDate == recievedDate
 				})
+				setSelectedDate(cdate => cdate)
 
 				if (newdata.length !== 0) {
 					let customers = newdata.map((el, i) => ({
