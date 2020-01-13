@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{ useEffect } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import DateFnsUtils from '@date-io/date-fns'
@@ -15,6 +15,8 @@ import Select from '@material-ui/core/Select'
 import Button from '@material-ui/core/Button'
 import Print from '@material-ui/icons/Print'
 import MaterialTable from 'material-table'
+import Axios from 'axios'
+import Moment from 'moment'
 
 const useStyles = makeStyles(theme => ({
 	formControl: {
@@ -38,6 +40,10 @@ const useStyles = makeStyles(theme => ({
 const stylesy = {}
 
 const Items = () => {
+	const [morningItems, setMorningItems] = React.useState([])
+	const [afternoonItems, setAfternoonItems] = React.useState([])
+	const [eveningItems, setEveningItems] = React.useState([])
+	const [allItems, setAllItems] = React.useState([])
 	const classes = useStyles()
 	const [session, setsession] = React.useState('All')
 
@@ -45,34 +51,114 @@ const Items = () => {
 		setsession(event.target.value)
 	}
 	const [selectedDate, setSelectedDate] = React.useState(
-		new Date('2019-11-01T21:11:54')
+		new Date()
 	)
 	const handleDateChange = date => {
+		let updatedDate = Moment(date).format('YYYY-MM-DD')
+		Axios.get('http://127.0.0.1:8000/hotel/order/').then(res => {
+			const changedData = res.data.filter(d => d.date_of_delivery.slice(0, 10) === updatedDate).map((el, i) => ({
+				sno:i+1,
+				session: el.session,
+				items: el.ordered_items.map((subel) => ({
+					name: subel.name,
+					quantity: subel.total_price / subel.price
+				})),
+				date: el.date_of_delivery
+			}))
+			setAllItems(state => ({
+				...state,
+				allItems: changedData
+			}))
+			setViewOrderState(state => ({
+				...state,
+				data: changedData,
+			}))
+		})
 		setSelectedDate(date)
 	}
 
-	const [state, setState] = React.useState({
+	const [viewOrderState, setViewOrderState] = React.useState({
 		columns: [
 			{ title: 'S.No', field: 'sno' },
 			{ title: 'item', field: 'item' },
 			{ title: 'Quantity', field: 'quantity' },
 			{ title: 'Date', field: 'date' },
 		],
-		data: [
-			{
-				sno: '1',
-				item: 'dosa',
-				quantity: 4,
-				date: '10/12/19',
-			},
-			{
-				sno: '1',
-				item: 'pongal',
-				quantity: 8,
-				date: '10/18/19',
-			},
-		],
+		data: [],
 	})
+
+	useEffect(() => {
+		const getData = async () => {
+			const today = Moment(Date()).format('YYYY-MM-DD')
+			let res = await Axios.get('http://127.0.0.1:8000/hotel/order/')
+			const data = res.data.filter(d => d.date_of_delivery.slice(0,10) === today).map((el, i) => ({
+				sno:i+1,
+				session: el.session,
+				items: el.ordered_items.map((subel) => ({
+					unique_id:subel.unique_id,
+					name: subel.name,
+					quantity: subel.total_price / subel.price, // change to subel.quantity
+					subitems: subel.subitems.map((subsubel)=>({
+						unique_id:subsubel.unique_id,
+						name: subsubel.name,
+						quantity: subsubel.quantity
+					}))
+				})),
+				date: el.date_of_delivery
+			}))
+			
+			let todayItems = data.map((el) => ([el.items]))
+			let subtodayitems = []
+			let tempItems = []
+
+			for(var i in todayItems){
+				for(var j in todayItems[i]){
+					for(var k in todayItems[i][j]){
+						subtodayitems.push(todayItems[i][j][k])
+					}
+				}
+			}
+
+			while(subtodayitems.length != 0){
+				tempItems.push(subtodayitems.shift())
+				for(i in subtodayitems){
+					if(tempItems[tempItems.length - 1].unique_id == subtodayitems[i].unique_id){
+						tempItems[tempItems.length - 1].quantity += subtodayitems[i].quantity
+						subtodayitems.splice(i, 1)
+					}
+				}
+			}
+			setAllItems((state) => ({
+				...state,
+				allItems: data,
+			}))
+
+			const morningData = data.filter(d => d.session == 'FN')
+			const afternoonData = data.filter(d => d.session == 'Afternoon')
+			const eveningData = data.filter(d => d.session == 'Evening')
+
+			setMorningItems(state => ({
+				...state,
+				morningItems: morningData
+			}))
+			
+			setAfternoonItems(state => ({
+				...state,
+				afternoonItems: afternoonData
+			}))
+
+			setEveningItems(state => ({
+				...state,
+				eveningItems: eveningData
+			}))
+
+			setViewOrderState(state => ({
+				...state,
+				data,
+			}))
+		}
+		getData()
+	}, [])
 
 	return (
 		<>
@@ -142,8 +228,8 @@ const Items = () => {
 							{session}
 							<MaterialTable
 								title=''
-								columns={state.columns}
-								data={state.data}
+								columns={viewOrderState.columns}
+								data={viewOrderState.data}
 								className={classes.tableSpacing}
 								style={{ boxShadow: 'none', padding: '10', width: '100%' }}
 							/>

@@ -161,43 +161,6 @@ const CustomerAndItems = () => {
 		getData()
 	}, [])
 
-	const data = [
-		{
-			customerName: 'Vishnu',
-			items: [
-				{
-					name: 'Chappathi',
-					quantity: 3
-				},
-				{
-					name: 'Dosa',
-					quantity: 4
-				},
-				{
-					name: 'Idly',
-					quantity: 10
-				}
-			]
-		},
-
-		{
-			customerName: 'War',
-			items: [
-				{
-					name: 'Chappathi',
-					quantity: 10
-				},
-				{
-					name: 'Dosa',
-					quantity: 10
-				},
-				{
-					name: 'Idly',
-					quantity: 10
-				}
-			]
-		}
-	]
 	return (
 		<>
 			<Grid container spacing={3}>
